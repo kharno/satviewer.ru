@@ -1,0 +1,79 @@
+{% extends 'viewer/base.html' %}
+{% load static %}
+
+{% block content %}
+<div id="message" class="container">
+    <form id="form" action="" method="POST" class="text-center">
+        {% csrf_token %}
+        <div class="row mb-3 justify-content-md-center">
+            <div class="col-3">
+                <input type="number" class="form-control" placeholder="NORAD ID" name="norad cat id" value="25544">
+            </div>
+            <div class="col-3">
+                <input type="datetime-local" class="form-control" name="start datetime" value="2022-08-21T00:00">
+            </div>
+            <div class="col-3">
+                <input type="datetime-local" class="form-control" name="end datetime" value="2022-08-21T18:00">
+            </div>
+        </div>
+        <div class="row mb-3 justify-content-md-center">
+            <div class="col-3">
+                <input type="number" class="form-control" placeholder="Широта точки наблюдения" name="latitude"
+                       value="55.7556">
+            </div>
+            <div class="col-3">
+                <input type="number" class="form-control" placeholder="Долгота точки наблюдения" name="longitude"
+                       value="37.643">
+            </div>
+            <div class="col-3">
+                <input type="number" class="form-control" placeholder="Высота над уровнем моря" name="elevation_m"
+                       value="186">
+            </div>
+        </div>
+        <div class="row mb-3 justify-content-md-center">
+            <div class="col-3">
+                <button type="submit" class="btn btn-primary mb-3">Расчитать прохождение</button>
+            </div>
+        </div>
+    </form>
+    <div id="loadingDiv" class="text-center">
+        <img src="{% static 'viewer/img/loader.gif' %}">
+    </div>
+    <div id="passes">
+    </div>
+</div>
+<script>
+        $(document).ready(function () {
+            // отслеживаем событие отправки формы
+            $('#form').submit(function () {
+                // создаем AJAX-вызов
+                $.ajax({
+                    url: "{% url 'show_passes' %}",
+                    data: $(this).serialize(), // получаем данные формы
+                    type: $(this).attr('method'), // GET или POST
+                    // если успешно, то
+                    success: function (response) {
+                        $("#passes").html(response.html);
+                    },
+                    // если ошибка, то
+                    error: function (response) {
+                        // предупредим об ошибке
+                        alert(response.responseJSON.errors);
+                        console.log(response.responseJSON.errors)
+                    }
+                });
+                return false;
+            });
+        })
+
+        var $loading = $('#loadingDiv').hide();
+        $(document)
+            .ajaxStart(function () {
+                $loading.show();
+            })
+            .ajaxStop(function () {
+                $loading.hide();
+            });
+
+</script>
+{% endblock %}

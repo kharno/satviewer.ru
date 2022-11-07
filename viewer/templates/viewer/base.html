@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="{% static 'viewer/img/satellite.png' %}" type="image/x-icon">
+    <link type="text/css" href="{% static 'viewer/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'viewer/css/styles.css' %}" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{% static 'viewer/js/jquery-3.6.1.min.js' %}"></script>
+    <title>SATVIEWER</title>
+</head>
+<body>
+    <header class="mt-5">
+        <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+            <h1 class="display-4 fw-normal">SATVIEWER</h1>
+            <p class="fs-5 text-muted">Расчет прохождения спутников в зоне наблюдения</p>
+        </div>
+    </header>
+{% block content %} 
+{% endblock %}
+</body>
+</html>

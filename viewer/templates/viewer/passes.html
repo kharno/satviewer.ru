@@ -1,0 +1,46 @@
+<div class="col text-center">
+    <h4>SATELLITE PASSES</h4>
+    <table class="table table-striped align-middle">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">NORAD</th>
+            <th scope="col">Time</th>
+            <th scope="col">Distance</th>
+            <th scope="col">Azimuth</th>
+            <th scope="col">Altitude</th>
+            <th scope="col">Height</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sp in satpasses %}
+        <tr>
+            <th scope="row"> {{ forloop.counter }}</th>
+            <td>{{ sp.sat_name }}</td>
+            <td>{{ sp.norad }}</td>
+            <td>{{ sp.enter.time }} <br>
+                {{ sp.mid.time }} <br>
+                {{ sp.exit.time }}
+            </td>
+            <td>{{ sp.enter.distance }} <br>
+                {{ sp.mid.distance }} <br>
+                {{ sp.exit.distance }}
+            </td>
+            <td>{{ sp.enter.azimuth }} <br>
+                {{ sp.mid.azimuth }} <br>
+                {{ sp.exit.azimuth }}
+            </td>
+            <td>{{ sp.enter.altitude }} <br>
+                {{ sp.mid.altitude }} <br>
+                {{ sp.exit.altitude }}
+            </td>
+            <td>{{ sp.enter.height }} <br>
+                {{ sp.mid.height }} <br>
+                {{ sp.exit.height }} <br>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
