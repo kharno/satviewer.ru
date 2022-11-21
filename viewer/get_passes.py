@@ -17,7 +17,7 @@ def get_passes(view_param,
             pass
 
     # loading satellite from a TLE file¶
-    stations_url = 'viewer/3le.txt'
+    stations_url = '3le.txt'
     satellites = load.tle_file(stations_url)
     satellite = {sat.model.satnum: sat for sat in satellites}[view_param['norad cat id']]
 
@@ -104,3 +104,19 @@ def get_passes(view_param,
         satpasses.append(satpass)
 
     return satpasses
+
+
+def main():
+    get_passes({
+        'norad cat id': 25544,
+        'start datetime': '2022-08-21T00:00',
+        'end datetime': '2022-08-21T18:00',
+        'latitude': 55.7556,
+        'longitude': 37.643,
+        'elevation_m': 186,
+    })
+
+
+if __name__ == '__main__':
+    main()
+
