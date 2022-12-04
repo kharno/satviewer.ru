@@ -6,8 +6,8 @@ from zoneinfo import ZoneInfo
 
 
 def get_passes(view_param,
-               az_min=0, az_max=360, alt_min=10, alt_max=90,
-               dist_min=0, dist_max=1000000):
+               az_min=0, az_max=360, alt_min=10, alt_max=55,
+               dist_min=250, dist_max=1000000):
 
     # correcting data type html form values
     for item in view_param.items():
@@ -17,7 +17,7 @@ def get_passes(view_param,
             pass
 
     # loading satellite from a TLE file¶
-    stations_url = '3le.txt'
+    stations_url = 'viewer/3le.txt'
     satellites = load.tle_file(stations_url)
     satellite = {sat.model.satnum: sat for sat in satellites}[view_param['norad cat id']]
 
@@ -39,39 +39,33 @@ def get_passes(view_param,
         start = tz.localize(view_param['start datetime'])
         end = tz.localize(view_param['end datetime'])
 
+    print(start)
     # finding when a satellite rises and sets¶
     ts = load.timescale()
-    t0 = ts.from_datetime(start)
-    t1 = ts.from_datetime(end)
-    t, events = satellite.find_events(view_position, t0, t1, altitude_degrees=0)
-    satpass_events = []
-    for ti, event in zip(t, events):
-        if event == 0:
-            satpass_event = []
-        satpass_events.append((ti, satpass_event))
-        if event == 2:
-            satpass_events.append(satpass_event)
+    t0_ts = ts.from_datetime(start)
+    t1_ts = ts.from_datetime(end)
+    ts_e, events = satellite.find_events(view_position, t0_ts, t1_ts, altitude_degrees=0)
+    datetimes_e = list(map(lambda ts: ts.utc_datetime(), ts_e))
 
-    # collecting info when a satellite in field of view
     satpasses_coords = []
-    for sp in satpass_events:
-        t = sp[0][0].utc_datetime()
-        t = t.replace(tzinfo=utc)
-        satpass_coords = []
-        while t < sp[2][0].utc_datetime():
-            difference = satellite - view_position
-            geocentric = satellite.at(ts.from_datetime(t))
-            topocentric = difference.at(ts.from_datetime(t))
-            height = wgs84.height_of(geocentric)
-            alt, az, distance = topocentric.altaz()
-            if (az_min <= az._degrees <= az_max and
-                    alt_min <= alt._degrees <= alt_max and
-                    dist_min <= distance.km <= dist_max):
-                satpass_coords.append(
-                    (t.astimezone(ZoneInfo(tzName)), distance.km, az._degrees, alt._degrees, height.km))
-            t = t + timedelta(seconds=5)
-        if satpass_coords:
-            satpasses_coords.append(satpass_coords)
+    for i, e in enumerate(events):
+        if e == 0:
+            t0 = datetimes_e[i]
+            t1 = datetimes_e[i+2]
+            satpass_coords = []
+            while t0 <= t1:
+                difference = satellite - view_position
+                geocentric = satellite.at(ts.from_datetime(t0))
+                topocentric = difference.at(ts.from_datetime(t0))
+                height = wgs84.height_of(geocentric)
+                alt, az, distance = topocentric.altaz()
+                if (az_min <= az._degrees <= az_max and
+                        alt_min <= alt._degrees <= alt_max and
+                        dist_min <= distance.km <= dist_max):
+                    satpass_coords.append((t0.astimezone(ZoneInfo(tzName)), distance.km, az._degrees , alt._degrees, round(height.km, 3)))
+                t0 += timedelta(seconds=5)
+            if len(satpass_coords) > 0:
+                satpasses_coords.append(satpass_coords)
 
     satpasses = []
     for item in satpasses_coords:
@@ -80,21 +74,21 @@ def get_passes(view_param,
             'sat_epoch': satellite.epoch.utc_datetime().strftime("%Y-%m-%d %H:%M:%S UTC"),
             'norad': view_param['norad cat id'],
             'enter': {
-                'time': item[0][0].strftime("%Y-%m-%d %H:%M:%S %z"),
+                'time': item[0][0].strftime("%Y-%m-%d %H:%M:%S %Z"),
                 'distance': round(item[0][1], 1),
                 'azimuth': round(item[0][2], 1),
                 'altitude': round(item[0][3], 1),
                 'height': round(item[0][4], 1)
             },
             'mid': {
-                'time': item[int(len(item) / 2)][0].strftime("%Y-%m-%d %H:%M:%S %z"),
+                'time': item[int(len(item) / 2)][0].strftime("%Y-%m-%d %H:%M:%S %Z"),
                 'distance': round(item[int(len(item) / 2)][1], 1),
                 'azimuth': round(item[int(len(item) / 2)][2], 1),
                 'altitude': round(item[int(len(item) / 2)][3], 1),
                 'height': round(item[int(len(item) / 2)][4], 1)
             },
             'exit': {
-                'time': item[-1][0].strftime("%Y-%m-%d %H:%M:%S %z"),
+                'time': item[-1][0].strftime("%Y-%m-%d %H:%M:%S %Z"),
                 'distance': round(item[-1][1], 1),
                 'azimuth': round(item[-1][2], 1),
                 'altitude': round(item[-1][3], 1),
@@ -107,14 +101,14 @@ def get_passes(view_param,
 
 
 def main():
-    get_passes({
+    print(get_passes({
         'norad cat id': 25544,
         'start datetime': '2022-08-21T00:00',
         'end datetime': '2022-08-21T18:00',
         'latitude': 55.7556,
         'longitude': 37.643,
         'elevation_m': 186,
-    })
+    }))
 
 
 if __name__ == '__main__':
