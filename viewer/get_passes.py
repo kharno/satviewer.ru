@@ -39,7 +39,7 @@ def get_passes(view_param,
         start = tz.localize(view_param['start datetime'])
         end = tz.localize(view_param['end datetime'])
 
-    print(start)
+    print(satellite.epoch.utc_datetime())
     # finding when a satellite rises and sets¶
     ts = load.timescale()
     t0_ts = ts.from_datetime(start)
@@ -69,9 +69,10 @@ def get_passes(view_param,
 
     satpasses = []
     for item in satpasses_coords:
+        print(round((item[0][0] - satellite.epoch.utc_datetime()).total_seconds()/3600))
         satpass = {
             'sat_name': satellite.name,
-            'sat_epoch': satellite.epoch.utc_datetime().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            'tle_update': f'{round((item[0][0] - satellite.epoch.utc_datetime()).total_seconds()/3600)} hours ago',
             'norad': view_param['norad cat id'],
             'enter': {
                 'time': item[0][0].strftime("%Y-%m-%d %H:%M:%S %Z"),

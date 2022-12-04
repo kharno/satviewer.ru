@@ -6,6 +6,7 @@
             <th scope="col">#</th>
             <th scope="col">Name</th>
             <th scope="col">NORAD</th>
+            <th scope="col">TLE update</th>
             <th scope="col">Time</th>
             <th scope="col">Distance</th>
             <th scope="col">Azimuth</th>
@@ -19,6 +20,7 @@
             <th scope="row"> {{ forloop.counter }}</th>
             <td>{{ sp.sat_name }}</td>
             <td>{{ sp.norad }}</td>
+            <td>{{ sp.tle_update }}</td>
             <td>{{ sp.enter.time }} <br>
                 {{ sp.mid.time }} <br>
                 {{ sp.exit.time }}
